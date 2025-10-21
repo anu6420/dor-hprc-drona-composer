@@ -281,7 +281,17 @@ function Picker(props) {
             className="btn btn-primary maroon-button"
             data-toggle="modal"
             data-target={"#local-file-picker-modal-" + props.name}
-            style={{ marginRight: "2px" }}
+            style={{
+              marginRight: "2px",
+              cursor: props.disableChange ? "not-allowed" : "pointer",
+              display: "block",               // ensure it spans full line
+              justifyContent: "center",    // center text horizontally
+              whiteSpace: "nowrap",        // prevent text from wrapping
+              width: "auto",               // allow width to expand only to content
+              alignItems: "center",        // vertically center text/icons
+
+            }}
+            disabled={props.disableChange}
           >
             {props.localLabel}
           </button>
@@ -294,6 +304,7 @@ function Picker(props) {
             className="form-control"
             onChange={handleValueChange}
             ref={inputRef}
+            disabled={props.disableChange}
           />
         </div>
       </FormElementWrapper>
