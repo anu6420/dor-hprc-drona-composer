@@ -106,10 +106,13 @@ class JobHistoryManager:
                 continue
         return transformed
 
-    def save_job(self, job_data, files, generated_files):
+    def save_job(self, job_data, files, generated_files, job_id=None):
         timestamp = datetime.now().isoformat()
         user = os.getenv('USER')
-        job_id = str(int(uuid.uuid4().int & 0xFFFFFFFFF))
+        if job_id is None:
+            job_id = str(int(uuid.uuid4().int & 0xFFFFFFFFF))
+        else:
+            job_id = str(job_id)
 
         form_data = self.transform_form_data(dict(job_data), job_data.get('location'))
         
@@ -181,4 +184,3 @@ class JobHistoryManager:
                 return history
         except (sqlite3.Error, PermissionError, json.JSONDecodeError):
             return []
-
