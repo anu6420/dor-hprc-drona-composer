@@ -29,17 +29,8 @@ def extract_job_id(submit_response):
 )
 def submit_job_route():
     """HTTP endpoint for job submission"""
+    params = request.form
     files = request.files
-    
-    job_id = str(int(uuid.uuid4().int & 0xFFFFFFFFF))
-    
-    params = dict(request.form)
-    if not params.get('name') or params.get('name').strip() == '':
-        params['name'] = 'unnamed'
-    
-    if not params.get('location') or params.get('location').strip() == '':
-        user = os.getenv('USER')
-        params['location'] = f"/scratch/user/{user}/drona_composer/runs"
     
     create_folder_if_not_exist(params.get('location'))
     
@@ -62,8 +53,7 @@ def submit_job_route():
         {
             "bash_script":   bash_script_path,
             "driver_script": driver_script_path
-        },
-        job_id=job_id
+        }
     )
 
     # Handle case where save_job returns False on error
@@ -80,16 +70,9 @@ def submit_job_route():
 
 def preview_job_route():
     """Preview a job script without submitting it"""
-    params = dict(request.form)
-    
-    if not params.get('name') or params.get('name').strip() == '':
-        params['name'] = 'unnamed'
-    
-    if not params.get('location') or params.get('location').strip() == '':
-        user = os.getenv('USER')
-        params['location'] = f"/scratch/user/{user}/drona_composer/runs"
-    
+    params = request.form
     engine = Engine()
+
     engine.set_environment(params.get('runtime'), params.get('env_dir'))
     preview_job = engine.preview_script(params)
 
@@ -121,3 +104,4 @@ def register_job_routes(blueprint, socketio_instance=None):
     blueprint.route('/preview', methods=['POST'])(preview_job_route)
     blueprint.route('/history', methods=['GET'])(get_history_route)
     blueprint.route('/history/<int:job_id>', methods=['GET'])(get_job_from_history_route)
+
