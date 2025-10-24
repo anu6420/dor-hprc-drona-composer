@@ -27,8 +27,10 @@ class JobHistoryManager:
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS job_history (
                         drona_id     TEXT PRIMARY KEY,
-                        job_name     TEXT,
+                        name         TEXT,
                         environment  TEXT NOT NULL,
+                        location     TEXT,
+                        runtime_meta TEXT NOT NULL DEFAULT '',
                         start_time   TEXT,
                         status       TEXT,
                         env_params   TEXT NOT NULL
@@ -149,12 +151,14 @@ class JobHistoryManager:
                 conn.execute("PRAGMA foreign_keys = ON")
                 conn.execute("""
                     INSERT INTO job_history 
-                    (drona_id, job_name, environment, start_time, status, env_params)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    (drona_id, name, environment, location, runtime_meta, start_time, status, env_params)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     job_id,
                     job_data.get('name'),
                     environment,
+                    job_data.get('location'),
+                    '',  # runtime_meta initially empty string
                     timestamp,
                     None,  # status is None by default
                     json.dumps(job_record)
